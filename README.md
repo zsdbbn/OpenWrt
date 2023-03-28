@@ -3,20 +3,21 @@
 <h1>OpenWrt — Actions</h1>
 </div>
 
--  群组: https://t.me/Jejz_168
+-  [群组](https://t.me/Jejz_168)
 
-- [******x86手动升级说明******](https://github.com/Jejz168/OpenWrt/blob/main/Upgrade.sh)
-- [******x86半自动升级下载******](https://github.com/Jejz168/OpenWrt/raw/main/Semi_automatic_update.sh)
 -  🛑******最好全新刷机******
--  必须要是本库最新才能使用。不然就会死翘翘。
--  此Semi_automatic_update.sh文件修改好后放到openwrt的root目录中
--  再进ssh输入👉  cd /root && chmod +x Semi_automatic_update.sh && ./Semi_automatic_update.sh
+-  本库x86为squashfs格式(Kernel=32M，rootfs=968M)
+-  ext4 与squashfs 格式的区别： ext4 格式的rootfs 可以扩展磁盘空间大小，而squashfs 不能。 squashfs 格式的rootfs 可以使用重置功能（恢复出厂设置），而ext4 不能。
+-  *必须要是本库最新才能使用。不然就会死翘翘。
+-  升级方法：下载好对应的版本（.img.gz），然后（openwrt-系统-备份/升级） *直接选择，不用解压
 # ==============================
 ## 项目说明 [![](https://img.shields.io/badge/-项目基本介绍-FFFFFF.svg)](#项目说明-)
 - 固件来源：[![Lean](https://img.shields.io/badge/Lede-Lean-red.svg?style=flat&logo=appveyor)](https://github.com/coolsnowwolf/lede) 
 - 项目使用 Github Actions 拉取 [Lean](https://github.com/coolsnowwolf/lede) 的 `Openwrt` 源码仓库进行云编译
-- arm 固件默认 IP 地址：`192.168.8.8` 默认密码：`password`
-- x86 固件默认 IP 地址：`192.168.8.3` 默认密码：`password`
+- 🔴arm 固件默认 IP 地址：`192.168.8.8` 默认密码：`password`
+- 🔴x86 固件默认 IP 地址：`192.168.8.3` 默认密码：`无密码`
+- 🔴x86[Docker] 固件默认 IP 地址：`192.168.8.3` 默认密码：`无密码`
+- 🔴x86[个人版] 固件默认 IP 地址：`192.168.8.5` 默认密码：`无密码`
 - 仓库编译的固件插件均为最新版本，最新版意味着可能有 BUG，如果之前使用稳定，则无需追新
 
 ## 插件预览 [![](https://img.shields.io/badge/-固件插件及功能预览-FFFFFF.svg)](#插件预览-)
@@ -53,6 +54,7 @@
 　├── 定时设置<br/>
 　├── 文件传输<br/>
 　├── Argon 主题设置<br/>
+　├── Design 主题设置<br/>
 　├── 重启<br/>
 　└── 关机
 </details>
@@ -65,15 +67,15 @@
 　├── 广告屏蔽大师 Plus+<br/>
 　├── AdGuard Home<br/>
 　├── ShadowSocksR Plus+<br/>
-　├── DDNS.to内网穿透<br/>
+　├── DDNSTO 远程控制<br/>
 　├── 应用过滤<br/>
 　├── 全能推送<br/>
 　├── 上网时间控制<br/>
 　├── 解锁网易云灰色歌曲<br/>
 　├── OpenClash<br/>
-　├── DDNS-GO<br/>
+　├── Lucky<br/>
 　├── 动态 DNS<br/>
-　├── SmartDNS<br/>
+　├── MosDNS<br/>
 　├── 网络唤醒<br/>
 　├── Frps<br/>
 　├── UPnP<br/>
@@ -97,10 +99,12 @@
 　├── NFS 管理<br/>
 　├── 阿里云盘 FUSE<br/>
 　├── 阿里云盘 WebDAV<br/>
+　├── Alist 文件列表<br/>
 　├── USB 打印服务器<br/>
 　├── 硬盘休眠<br/>
 　├── 打印服务器<br/>
 　├── 网络共享<br/>
+　├── Aria2 配置<br/>
 　└── FTP 服务器
 </details>
 <details>
@@ -139,7 +143,9 @@
 </details>
 
 ## 固件下载
-点击下表中 [![](https://img.shields.io/badge/下载-链接-blueviolet.svg?style=flat&logo=hack-the-box)](https://github.com/Jejz168/OpenWrt/releases) 即可跳转到该设备固件下载页面
+**点击跳转到该设备固件下载页面**
+- [**X86下载地址**](https://github.com/Jejz168/OpenWrt/releases)
+- [**Arm下载地址**](https://github.com/Jejz168/OpenWrt/releases/tag/ARMv8)
 
 ## 鸣谢 [![](https://img.shields.io/badge/-跪谢各大佬-FFFFFF.svg)](#鸣谢-)
 | [ImmortalWrt](https://github.com/immortalwrt) | [coolsnowwolf](https://github.com/coolsnowwolf) | [P3TERX](https://github.com/P3TERX) | [Flippy](https://github.com/unifreq) | [haiibo](https://github.com/haiibo) | [Lenyu2020](https://github.com/Lenyu2020) |

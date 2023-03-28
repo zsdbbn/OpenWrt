@@ -30,7 +30,7 @@ env:
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
   FILE_NAME: ARMv8-ROOTFS
-  PRODUCT_NAME: ARMv8
+  PRODUCT_NAME: ARMv8-ROOTFS
 
 jobs:
   build:
@@ -38,8 +38,8 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@main
-      
+      uses: actions/checkout@v3
+
     - name: Check server configuration
       run: |
         echo "警告⚠"
@@ -58,20 +58,28 @@ jobs:
         echo "硬盘详情："
         echo " 系统空间       类型     总数   已用  可用  使用率"
         df -Th
-        
+
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-       sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2204-make-openwrt-depends)
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean
+        sudo -E swapoff -a
+        sudo -E rm -f /swapfile
+        sudo -E docker image prune -a -f
+        sudo -E snap set system refresh.retain=2
+        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+        sudo -E apt-get -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* moby* snap*
+        [ -n "$AGENT_TOOLSDIRECTORY" ] && sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        sudo -E apt-get update
+        sudo -E apt-get -y install $(curl -fsSL https://is.gd/depends_ubuntu_2204)
+        sudo -E apt-get -y install libfuse-dev
+        sudo -E apt-get -y autoremove --purge
+        sudo -E apt-get clean
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
-        
+        df -Th
+
     - name: Clone source code
       working-directory: /workdir
       run: |
@@ -96,7 +104,7 @@ jobs:
         chmod +x $DIY_P1_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
-        
+
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
@@ -109,7 +117,7 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
-        
+
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
       if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
@@ -131,12 +139,12 @@ jobs:
         sed -i '/Transparent_Proxy/d' Plug-in > /dev/null 2>&1
         sed -i 's/=y/\ /g' Plug-in
         awk '$0=NR$0' Plug-in > Plug-2
-        awk '{print "	" $0}' Plug-2 > Plug-in    
+        awk '{print "	" $0}' Plug-2 > Plug-in
         echo
         echo
         echo "	      已选插件列表"
         cat Plug-in
-        rm -rf {Plug-in,Plug-2}  
+        rm -rf {Plug-in,Plug-2}
         echo
         echo "=========================================="
         echo
@@ -145,7 +153,7 @@ jobs:
         echo
         echo
         cat .config
-        
+
     - name: Download package
       id: package
       run: |
@@ -154,19 +162,18 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-        
+
     - name: Compile the firmware
       id: compile
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 V=s
-        #echo "::set-output name=status::success"
         echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-        
+
     - name: Check space usage
       run: |
         echo "=========================================="
@@ -185,7 +192,7 @@ jobs:
         mkdir -p ./artifact/buildinfo
         cp -rf openwrt/.config ./artifact/buildinfo/armv8.config
         cp -rf $(find openwrt/bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
-        
+
     - name: Upload bin directory
       uses: actions/upload-artifact@main
       if: env.UPLOAD_BIN_DIR == 'true' && steps.compile.outputs.status == 'success'
@@ -199,7 +206,7 @@ jobs:
       with:
         name: armv8-config
         path: ./artifact/buildinfo/
-        
+
     - name: Organize files
       id: organize
       if: steps.compile.outputs.status == 'success'
@@ -210,9 +217,8 @@ jobs:
         cd $GITHUB_WORKSPACE/openwrt/bin/targets/*/*
         rm -rf config.buildinfo feeds.buildinfo openwrt-armvirt-64-default.manifest openwrt-armvirt-64-Image version.buildinfo
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        #echo "::set-output name=status::success"
         echo "status=success" >> $GITHUB_OUTPUT
-        
+
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
       if: env.UPLOAD_FIRMWARE == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
@@ -231,14 +237,14 @@ jobs:
         tag: ${{ env.FILE_NAME }}
         token: ${{ secrets.GH_TOKEN }}
         body: |
-          - 🔥此为 ARMv8 底包，非完整固件，不可直刷
+          - 🔴此为 ARMv8 底包，非完整固件，不可直刷
           - 当前使用版本:【编译前的最后一次[➦主源码](https://github.com/coolsnowwolf/lede)更新记录】
           - ★ 感谢源码作者无私分享！
           - 🎈🎈🎈 更新信息 🎈🎈🎈
-          - 作者: ${{ env.author }}        
-          - 时间: ${{ env.date }}       
-          - 内容: ${{ env.commit }}       
-          - hash: ${{ env.hash }} 
+          - 作者: ${{ env.author }}
+          - 时间: ${{ env.date }}
+          - 内容: ${{ env.commit }}
+          - hash: ${{ env.hash }}
         artifacts: ${{ env.FIRMWARE }}/*
 
     - name: Total time
@@ -252,20 +258,20 @@ jobs:
         HMS=`echo ${hour}:${min}:${sec}`
         echo "time=$HMS" >> $GITHUB_ENV
 
-    - name: Telegram notification upload success
-      uses: appleboy/telegram-action@master
-      with:
-        to: ${{ secrets.TELEGRAM_TO }}
-        token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: |
-          🌺${{ env.PRODUCT_NAME }}编译完成
-          开始时间：${{ env.DATE }}
-          完成时间：${{ env.DATE1 }}
-          编译耗时：${{ env.time }}
-          🎈🎈🎈 更新信息 🎈🎈🎈
-          作者: ${{ env.author }}
-          时间: ${{ env.date }}
-          内容: ${{ env.commit }}
-          hash: ${{ env.hash }}
-          ✪ ✣ ✤ ✥ ✦ ❉ ❦ ❧ ❃ ❂ ❁ ❀
-          📍: https://github.com/Jejz168/OpenWrt/releases/tag/ARMv8-ROOTFS
+    - name: Telegram notification
+      run: |
+        MSG="
+        🌺${{ env.PRODUCT_NAME }}编译完成
+        开始时间：${{ env.DATE }}
+        完成时间：${{ env.DATE1 }}
+        编译耗时：${{ env.time }}
+        🎈🎈🎈 更新信息 🎈🎈🎈
+        作者: ${{ env.author }}
+        时间: ${{ env.date }}
+        内容: ${{ env.commit }}
+        hash: ${{ env.hash }}
+        ✪ ✣ ✤ ✥ ✦ ❉ ❦ ❧ ❃ ❂ ❁ ❀
+        📍: https://github.com/Jejz168/OpenWrt/releases/tag/ARMv8-ROOTFS
+        "
+        curl "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" -d "chat_id=${{ secrets.TELEGRAM_TO }}&text=${MSG}"
+        curl "http://www.pushplus.plus/send?token=${{ secrets.PUSH_PLUS_TOKEN }}" -d "title=${{ env.FILE_NAME }}编译完成&content=${MSG}"

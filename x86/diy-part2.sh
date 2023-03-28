@@ -20,7 +20,16 @@ export FORCE_UNSAFE_CONFIGURE=1
 sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
 
 # 设置密码为空（安装固件时无需密码登陆，然后自己修改想要的密码）
-# sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz-default-settings
+sed -i '/$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF./d' package/lean/default-settings/files/zzz-default-settings
+
+# 调整 x86 型号只显示 CPU 型号
+sed -i 's/${g}.*/${a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
+
+# 修改版本号
+# edition_version=23.2.16
+# date_version=$(date +"%y.%m.%d")
+# orig_version=$(cat "package/lean/default-settings/files/zzz-default-settings" | grep DISTRIB_REVISION= | awk -F "'" '{print $2}')
+# sed -i "s/${orig_version}/R${date_version}/g" package/lean/default-settings/files/zzz-default-settings
 
 # 设置ttyd免帐号登录
 sed -i 's/\/bin\/login/\/bin\/login -f root/' feeds/packages/utils/ttyd/files/ttyd.config
@@ -35,10 +44,13 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-n
 
 # 报错修复
 # sed -i 's/9625784cf2e4fd9842f1d407681ce4878b5b0dcddbcd31c6135114a30c71e6a8/5de8c8e29aaa3fb9cc6b47bb27299f271354ebb72514e3accadc7d38b5bbaa72/g' feeds/packages/utils/jq/Makefile
+# sed -i 's/PKG_VERSION:=.*/PKG_VERSION:=1.7.2/g' feeds/Jejz/xray-core/Makefile
+# sed -i 's/PKG_HASH:=.*/PKG_HASH:=e35824e19e8acc06296ce6bfa78a14a6f3ee8f42a965f7762b7056b506457a29/g' feeds/Jejz/xray-core/Makefile
 
 # svn co 复制 仓库下的文件夹 git clone 复制整个仓库
 # ikoolproxy
 git clone https://github.com/iwrt/luci-app-ikoolproxy.git package/luci-app-ikoolproxy
+cp -f $GITHUB_WORKSPACE/personal/files/* package/luci-app-ikoolproxy/koolproxy/files
 
 # vssr
 git clone https://github.com/jerrykuku/lua-maxminddb.git package/lua-maxminddb
@@ -49,7 +61,10 @@ git clone https://github.com/jerrykuku/luci-app-vssr.git package/luci-app-vssr
 # svn co https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-netdata package/luci-app-netdata
 
 # ddns-go 动态域名
-git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
+# git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
+
+# lucky 大吉
+git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
 
 # ddnsto
 svn co https://github.com/linkease/nas-packages-luci/trunk/luci/luci-app-ddnsto package/luci-app-ddnsto
@@ -59,7 +74,11 @@ svn co https://github.com/linkease/nas-packages/trunk/network/services/ddnsto pa
 git clone https://github.com/destan19/OpenAppFilter.git package/OpenAppFilter
 
 # autotimeset 定时
-git clone https://github.com/sirpdboy/luci-app-autotimeset package/luci-app-autotimeset
+# git clone https://github.com/sirpdboy/luci-app-autotimeset package/luci-app-autotimeset
+
+# dockerman
+rm -rf feeds/luci/applications/luci-app-dockerman
+svn co https://github.com/lisaac/luci-app-dockerman/trunk/applications/luci-app-dockerman package/luci-app-dockerman
 
 # eqos 限速
 svn co https://github.com/kiddin9/openwrt-packages/trunk/luci-app-eqos package/luci-app-eqos
@@ -68,10 +87,11 @@ svn co https://github.com/kiddin9/openwrt-packages/trunk/luci-app-eqos package/l
 git clone https://github.com/esirplayground/luci-app-poweroff package/luci-app-poweroff
 
 # unblockneteasemusic
-git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git package/luci-app-unblockneteasemusic
+# git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git package/luci-app-unblockneteasemusic
 
 # adguardhome
-git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package/luci-app-adguardhome
+# git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package/luci-app-adguardhome
+svn co https://github.com/xiangfeidexiaohuo/openwrt-packages/trunk/luci-app-adguardhome package/luci-app-adguardhome
 
 # 阿里云盘webdav
 rm -rf feeds/luci/applications/luci-app-aliyundrive-webdav
@@ -94,8 +114,14 @@ svn co https://github.com/Lienol/openwrt-package/trunk/luci-app-filebrowser pack
 # mosdns
 # find ./ | grep Makefile | grep mosdns | xargs rm -f
 rm -rf feeds/packages/net/mosdns
+rm -rf feeds/luci/applications/luci-app-mosdns
 svn co https://github.com/sbwml/luci-app-mosdns/trunk/luci-app-mosdns package/luci-app-mosdns
 svn co https://github.com/sbwml/luci-app-mosdns/trunk/mosdns package/mosdns
+
+# alist
+rm -rf feeds/packages/lang/golang
+svn export https://github.com/sbwml/packages_lang_golang/branches/19.x feeds/packages/lang/golang
+git clone https://github.com/sbwml/luci-app-alist package/alist
 
 # turboacc 去dns
 # sed -i '60,70d' feeds/luci/applications/luci-app-turboacc/Makefile
@@ -108,10 +134,11 @@ svn co https://github.com/xiangfeidexiaohuo/openwrt-packages/trunk/patch/luci-ap
 svn co https://github.com/xiaorouji/openwrt-passwall/branches/luci/luci-app-passwall package/luci-app-passwall
 
 # passwall2
-svn co https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2 package/luci-app-passwall2
+# svn co https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2 package/luci-app-passwall2
 
 # openclash
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/luci-app-openclash
+# svn co https://github.com/vernesong/OpenClash/branches/dev/luci-app-openclash package/luci-app-openclash
 # 编译 po2lmo (如果有po2lmo可跳过)
 pushd package/luci-app-openclash/tools/po2lmo
 make && sudo make install
@@ -119,8 +146,13 @@ popd
 
 # argon 主题
 rm -rf feeds/luci/themes/luci-theme-argon
+rm -rf feeds/luci/themes/luci-theme-design
+rm -rf feeds/luci/applications/luci-app-argon-config
+rm -rf feeds/luci/applications/luci-app-design-config
 git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
 git clone https://github.com/jerrykuku/luci-app-argon-config package/luci-app-argon-config
+git clone https://github.com/gngpp/luci-theme-design.git package/luci-theme-design
+git clone https://github.com/gngpp/luci-app-design-config.git package/luci-app-design-config
 
 # 主机名右上角符号❤
 # sed -i 's/❤/❤/g' package/lean/luci-theme-argon_armygreen/luasrc/view/themes/argon_armygreen/header.htm
@@ -139,7 +171,6 @@ sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")
 # 修改欢迎banner
 cp -f $GITHUB_WORKSPACE/personal/banner package/base-files/files/etc/banner
 # wget -O ./package/base-files/files/etc/banner https://raw.githubusercontent.com/Jejz168/OpenWrt/main/personal/banner
-cp -f $GITHUB_WORKSPACE/personal/files/* package/luci-app-ikoolproxy/koolproxy/files
 
 # 固件更新地址
 sed -i '/CPU usage/a\                <tr><td width="33%"><%:Compile update%></td><td><a target="_blank" href="https://github.com/Jejz168/OpenWrt/releases">👆查看</a></td></tr>'  package/lean/autocore/files/x86/index.htm

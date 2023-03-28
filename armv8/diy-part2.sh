@@ -24,9 +24,10 @@ sed -i 's/\/bin\/login/\/bin\/login -f root/' feeds/packages/utils/ttyd/files/tt
 
 # 报错修复
 # rm -rf package/kernel/mac80211/patches/brcm/999-backport-to-linux-5.18.patch
-# sed
-sed -i 's/PKG_VERSION:=.*/PKG_VERSION:=4.8/g' tools/sed/Makefile
-sed -i 's/PKG_HASH:=.*/PKG_HASH:=f79b0cfea71b37a8eeec8490db6c5f7ae7719c35587f21edb0617f370eeff633/g' tools/sed/Makefile
+# sed -i 's/PKG_VERSION:=.*/PKG_VERSION:=4.8/g' tools/sed/Makefile
+# sed -i 's/PKG_HASH:=.*/PKG_HASH:=f79b0cfea71b37a8eeec8490db6c5f7ae7719c35587f21edb0617f370eeff633/g' tools/sed/Makefile
+# sed -i 's/PKG_VERSION:=.*/PKG_VERSION:=1.7.2/g' feeds/Jejz/xray-core/Makefile
+# sed -i 's/PKG_HASH:=.*/PKG_HASH:=e35824e19e8acc06296ce6bfa78a14a6f3ee8f42a965f7762b7056b506457a29/g' feeds/Jejz/xray-core/Makefile
 
 # svn co 复制 仓库下的文件夹 git clone 复制整个仓库
 # OpenAppFilter 应用过滤
@@ -60,13 +61,14 @@ svn co https://github.com/messense/aliyundrive-fuse/trunk/openwrt/luci-app-aliyu
 svn co https://github.com/messense/aliyundrive-fuse/trunk/openwrt/aliyundrive-fuse package/aliyundrive-fuse
 
 # autotimeset 定时
-git clone https://github.com/sirpdboy/luci-app-autotimeset package/luci-app-autotimeset
+# git clone https://github.com/sirpdboy/luci-app-autotimeset package/luci-app-autotimeset
 
 # unblockneteasemusic
-git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git package/luci-app-unblockneteasemusic
+# git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git package/luci-app-unblockneteasemusic
 
 # adguardhome
-svn co https://github.com/rufengsuixing/luci-app-adguardhome/trunk package/luci-app-adguardhome
+# git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package/luci-app-adguardhome
+svn co https://github.com/xiangfeidexiaohuo/openwrt-packages/trunk/luci-app-adguardhome package/luci-app-adguardhome
 
 # dockerman
 rm -rf feeds/luci/applications/luci-app-dockerman
@@ -84,12 +86,17 @@ svn co https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2 p
 # smartdns
 # git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/luci-app-smartdns
 
+# alist
+rm -rf feeds/packages/lang/golang
+svn export https://github.com/sbwml/packages_lang_golang/branches/19.x feeds/packages/lang/golang
+git clone https://github.com/sbwml/luci-app-alist package/alist
+
 # mosdns
 # find ./ | grep Makefile | grep mosdns | xargs rm -f
 rm -rf feeds/packages/net/mosdns
+rm -rf feeds/luci/applications/luci-app-mosdns
 svn co https://github.com/sbwml/luci-app-mosdns/trunk/luci-app-mosdns package/luci-app-mosdns
 svn co https://github.com/sbwml/luci-app-mosdns/trunk/mosdns package/mosdns
-
 
 # turboacc 去dns
 # sed -i '60,70d' feeds/luci/applications/luci-app-turboacc/Makefile
@@ -103,13 +110,17 @@ svn co https://github.com/xiangfeidexiaohuo/openwrt-packages/trunk/patch/luci-ap
 # svn co https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-netdata package/luci-app-netdata
 
 # ddns-go 动态域名
-git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
+# git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
+
+# lucky 大吉
+git clone https://github.com/gdy666/luci-app-lucky.git package/lucky
 
 # eqos 限速
 svn co https://github.com/kiddin9/openwrt-packages/trunk/luci-app-eqos package/luci-app-eqos
 
 # 科学上网插件依赖
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/luci-app-openclash
+# svn co https://github.com/vernesong/OpenClash/branches/dev/luci-app-openclash package/luci-app-openclash
 # 编译 po2lmo (如果有po2lmo可跳过)
 pushd package/luci-app-openclash/tools/po2lmo
 make && sudo make install
@@ -118,6 +129,9 @@ popd
 # Themes 主题
 rm -rf feeds/luci/themes/luci-theme-argon
 rm -rf feeds/luci/themes/luci-theme-netgear
+rm -rf feeds/luci/themes/luci-theme-design
+rm -rf feeds/luci/applications/luci-app-argon-config
+rm -rf feeds/luci/applications/luci-app-design-config
 svn co https://github.com/rosywrt/luci-theme-rosy/trunk/luci-theme-rosy package/luci-theme-rosy
 svn co https://github.com/haiibo/packages/trunk/luci-theme-atmaterial_new package/luci-theme-atmaterial_new
 svn co https://github.com/haiibo/packages/trunk/luci-theme-opentomcat package/luci-theme-opentomcat
@@ -127,6 +141,8 @@ git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/luc
 git clone https://github.com/jerrykuku/luci-app-argon-config package/luci-app-argon-config
 git clone https://github.com/sirpdboy/luci-theme-opentopd package/luci-theme-opentopd
 git clone https://github.com/thinktip/luci-theme-neobird package/luci-theme-neobird
+git clone https://github.com/gngpp/luci-theme-design.git package/luci-theme-design
+git clone https://github.com/gngpp/luci-app-design-config.git package/luci-app-design-config
 
 # 主机名右上角符号❤
 # sed -i 's/❤/❤/g' package/lean/luci-theme-argon_armygreen/luasrc/view/themes/argon_armygreen/header.htm
@@ -156,7 +172,7 @@ sed -i 's/<a href=\"https:\/\/github.com\/coolsnowwolf\/luci\">/<a>/g' feeds/luc
 # 晶晨宝盒
 svn co https://github.com/ophub/luci-app-amlogic/trunk/luci-app-amlogic package/luci-app-amlogic
 sed -i "s|https.*/OpenWrt|https://github.com/Jejz168/OpenWrt|g" package/luci-app-amlogic/root/etc/config/amlogic
-sed -i "s|opt/kernel|backup/kernel|g" package/luci-app-amlogic/root/etc/config/amlogic
+# sed -i "s|http.*/library|https://github.com/Jejz168/OpenWrt/backup/kernel|g" package/luci-app-amlogic/root/etc/config/amlogic
 sed -i "s|ARMv8|ARMv8|g" package/luci-app-amlogic/root/etc/config/amlogic
 
 # 修改makefile
